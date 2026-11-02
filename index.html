@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Deltasig Final Exam Practice</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Lato:wght@400;700&display=swap">
+<style>
+/* Layout: one module slide at a time, gold slide on a white LMS page, nav bar under the slide.
+   Deliberately single-theme: replicates the light Delta Sigma Pi module look. */
+:root{
+  color-scheme:light;
+  --page:#FFFFFF; --gold:#F3D88B; --blue:#1537A0; --purple:#33065F; --ink:#111111;
+  --tile:#D9D9D9; --tile-dark:#575A55; --row-sel:#E0E0DE; --exp:#ADAEAA; --exp-line:#8E8F8B;
+  --good:#33501F; --bad:#8E1F1A; --cream:#FBEDCF; --muted:#555555;
+  --head:"Archivo Black","Arial Black",Impact,sans-serif;
+  --body:Arial,Helvetica,"Liberation Sans",sans-serif;
+  --ui:"Lato",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+body{background:var(--page);color:var(--ink);font-family:var(--body);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 32px}
+.wrap{max-width:1000px;margin:0 auto}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:18px 14px;font-family:var(--ui);color:#444}
+.top .t{display:flex;align-items:center;gap:14px;font-size:1.05rem;min-width:0}
+.burger{width:22px;display:grid;gap:4px;flex:none}.burger i{height:2px;background:#444;display:block}
+.top .r{font-weight:700;letter-spacing:.1em;font-size:.78rem;white-space:nowrap}
+.slide{position:relative;background:var(--gold);padding:28px clamp(16px,4vw,44px) 70px;min-height:520px;overflow:hidden}
+.badge{position:absolute;top:10px;left:10px;background:#3B3A33;color:#fff;font-family:var(--ui);font-size:.75rem;padding:4px 9px;border-radius:6px}
+h2{font-family:var(--head);color:var(--blue);font-weight:400;font-size:clamp(1.9rem,5.2vw,3.1rem);line-height:1.05;margin:14px 0 10px}
+h2.small{font-size:clamp(1.25rem,3vw,1.9rem)}
+.prompt{font-size:clamp(1rem,2.2vw,1.35rem);line-height:1.35;margin:0 0 22px;max-width:62ch;text-wrap:pretty}
+/* choice rows */
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:clamp(48px,8vw,76px) 1fr;min-height:52px;cursor:pointer;border:0;padding:0;background:none;text-align:left;font:inherit;color:inherit}
+.opt .L{background:var(--tile);display:grid;place-items:center;font-size:clamp(1.2rem,2.6vw,1.8rem)}
+.opt .T{background:#fff;padding:12px 16px;font-size:clamp(.95rem,2vw,1.2rem);line-height:1.3;display:flex;align-items:center;min-width:0}
+.opt.on .L{background:var(--tile-dark)}
+.opt.on .T{background:var(--row-sel);box-shadow:0 2px 6px rgba(60,50,110,.35)}
+.opt:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+/* drag chips + slots */
+.chip{background:var(--purple);color:#fff;font-weight:700;font-family:var(--ui);border-radius:7px;padding:10px 16px;box-shadow:0 3px 5px rgba(0,0,0,.3);
+  cursor:grab;user-select:none;-webkit-user-select:none;text-align:center;font-size:clamp(.92rem,1.9vw,1.15rem);line-height:1.25;touch-action:manipulation}
+.chip.sel{outline:3px solid #fff;box-shadow:0 0 0 6px var(--blue)}
+.slot{border:2px dashed rgba(51,6,95,.55);background:rgba(255,255,255,.45);border-radius:7px;min-height:46px;display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-family:var(--ui);font-size:.85rem;cursor:pointer;padding:4px}
+.slot.hot{border-color:var(--blue);background:rgba(255,255,255,.8)}
+.slot .chip{width:100%;cursor:pointer}
+.slot.filled{border:0;background:none;padding:0}
+.chip:focus-visible,.slot:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.bank{display:flex;flex-direction:column;gap:12px;min-width:0}
+.bank.row{flex-direction:row;flex-wrap:wrap}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px 40px;align-items:start}
+.num{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:center}
+.num b{font-weight:400;font-size:clamp(1.2rem,2.5vw,1.8rem);text-align:right}
+.nums{display:grid;gap:12px}
+@media (max-width:640px){.two{grid-template-columns:1fr}}
+/* preamble */
+.para{font-size:clamp(1.05rem,2.6vw,1.6rem);line-height:2.25;margin:0 0 20px}
+.para .slot{display:inline-flex;min-width:150px;min-height:40px;vertical-align:middle}
+.para .slot.filled .chip{padding:6px 14px}
+/* greek */
+.greek{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:center}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,110px));gap:12px}
+.gtile{aspect-ratio:1;max-width:100%;background:#ADAEAA;color:#fff;display:grid;place-items:center;font-family:"Times New Roman",Times,serif;font-size:clamp(2rem,6vw,4rem);
+  box-shadow:2px 3px 5px rgba(0,0,0,.3);cursor:grab;user-select:none;-webkit-user-select:none;border:0;padding:0}
+.gtile.sel{outline:4px solid var(--blue)}
+.drops{display:grid;grid-template-columns:repeat(3,minmax(0,110px));gap:14px}
+.drop{display:grid;gap:6px;justify-items:center}
+.drop .slot{aspect-ratio:1;width:100%;min-height:0;padding:0}
+.drop .slot.filled .gtile{width:100%}
+.drop span{font-family:var(--head);color:var(--purple);font-size:clamp(.8rem,1.8vw,1.1rem)}
+@media (max-width:640px){.greek{grid-template-columns:1fr}}
+/* LEAD */
+.circ{width:clamp(110px,16vw,150px);aspect-ratio:1;border-radius:50%;background:var(--purple);color:#fff;font-family:var(--ui);font-weight:700;display:grid;place-items:center;text-align:center;
+  padding:12px;font-size:clamp(.95rem,2vw,1.35rem);line-height:1.15;box-shadow:4px 5px 0 #fff,6px 8px 10px rgba(0,0,0,.25);cursor:grab;user-select:none;-webkit-user-select:none;border:0}
+.circ.sel{outline:4px solid var(--blue)}
+.leadbank{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:22px;min-height:40px}
+.leadrow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;margin-bottom:18px}
+.leadrow .desc{background:var(--cream);border:1px solid #E7D7AE;padding:14px 18px;font-size:clamp(.95rem,2vw,1.2rem);line-height:1.35}
+.leadrow .slot{width:clamp(110px,16vw,150px);aspect-ratio:1;border-radius:50%;min-height:0}
+.leadrow .slot.filled .circ{width:100%}
+@media (max-width:520px){.leadrow{grid-template-columns:1fr;justify-items:start}}
+/* match */
+.match{display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1.6fr);gap:22px 32px;align-items:start}
+.ents{display:grid;gap:22px}
+.ent{background:#fff;border:1px solid #999;padding:18px 14px;font-size:clamp(1rem,2.4vw,1.6rem)}
+.mrows{display:grid;gap:12px}
+.mrow{display:grid;grid-template-columns:clamp(70px,9vw,96px) minmax(0,1fr);gap:16px}
+.arrow{background:var(--blue);color:#fff;border:0;font:inherit;font-size:clamp(1.1rem,2.4vw,1.6rem);display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;min-height:56px}
+.msel{appearance:none;-webkit-appearance:none;background:var(--blue) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath d='M7 12 1 4h12z' fill='%23fff'/%3E%3C/svg%3E") no-repeat right 12px center;
+  color:#fff;border:0;border-radius:0;font:inherit;font-size:clamp(1.1rem,2.4vw,1.6rem);padding:0 32px 0 16px;min-height:56px;width:100%;cursor:pointer}
+.msel option{color:#111;background:#fff}
+.msel:focus-visible{outline:3px solid #fff;outline-offset:-5px}
+.msel:disabled{cursor:default;opacity:1}
+.mrow .st{background:var(--tile);border:1px solid #999;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 12px;font-size:clamp(.85rem,1.8vw,1.05rem)}
+@media (max-width:640px){.match{grid-template-columns:1fr}.ents{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.ent{padding:10px 8px;font-size:.9rem}}
+/* setup */
+textarea{width:100%;min-height:200px;font:inherit;font-size:1rem;padding:12px;border:1px solid #C9B36A;background:#fff;color:var(--ink)}
+.setupnote{font-size:1rem;line-height:1.4;max-width:60ch;margin:0 0 12px}
+/* feedback */
+.exp{position:absolute;right:clamp(12px,3vw,40px);bottom:66px;max-width:min(470px,calc(100% - 24px));background:var(--exp);border:1px solid var(--exp-line);border-radius:4px;
+  color:#fff;padding:16px 20px;font-size:clamp(1rem,2.3vw,1.6rem);line-height:1.25;text-shadow:1px 1px 2px rgba(0,0,0,.35);z-index:3}
+.exp ol,.exp ul{margin:6px 0 0;padding-left:1.2em;font-size:.8em}
+.exp.long{font-size:clamp(.9rem,1.8vw,1.15rem)}
+.fb{position:absolute;left:0;right:0;bottom:0;height:52px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--ui);font-size:1.25rem;z-index:4}
+.fb.ok{background:var(--good)} .fb.no{background:var(--bad)}
+.fb button{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:0;color:#fff;font-size:1.6rem;cursor:pointer;padding:4px 8px}
+@media (max-width:640px){.exp{position:static;margin-top:18px;max-width:none}.slide{padding-bottom:72px}}
+/* nav */
+.nav{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-block:14px;font-family:var(--ui)}
+.nav .mid{display:flex;gap:10px;align-items:center}
+.btn{font:inherit;font-weight:700;border:2px solid var(--purple);background:#fff;color:var(--purple);padding:9px 18px;border-radius:6px;cursor:pointer}
+.btn.pri{background:var(--purple);color:#fff}
+.btn:disabled{opacity:.4;cursor:default}
+.btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.count{color:var(--muted);font-variant-numeric:tabular-nums;font-size:.95rem}
+.dots{display:flex;flex-wrap:wrap;gap:5px;padding-block:4px 0}
+.dot{width:14px;height:14px;border-radius:3px;border:1px solid #bbb;background:#fff;cursor:pointer;padding:0}
+.dot.cur{border:2px solid var(--purple)}
+.dot.ok{background:var(--good);border-color:var(--good)} .dot.no{background:var(--bad);border-color:var(--bad)}
+.dot.mod{margin-left:8px}
+/* results */
+.res .big{font-family:var(--head);color:var(--purple);font-size:clamp(2.2rem,7vw,4rem);margin:4px 0 6px;font-variant-numeric:tabular-nums}
+.res ul{padding:0;list-style:none;display:grid;gap:8px;margin:14px 0 22px}
+.res li button{background:#fff;border:1px solid #C9B36A;padding:10px 14px;width:100%;text-align:left;font:inherit;cursor:pointer}
+.res .acts{display:flex;gap:10px;flex-wrap:wrap}
+@media (prefers-reduced-motion:no-preference){.fb,.exp{animation:rise .25s ease-out}@keyframes rise{from{transform:translateY(8px);opacity:.4}to{transform:none;opacity:1}}}
+</style>
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <div class="t"><span class="burger" aria-hidden="true"><i></i><i></i><i></i></span><span id="mtitle">Delta Sigma Pi - Final Exam</span></div>
+    <div class="r" id="mcount"></div>
+  </div>
+  <section class="slide" id="slide" aria-live="polite"></section>
+  <div class="nav">
+    <button class="btn" id="prev">Back</button>
+    <div class="mid"><span class="count" id="count"></span></div>
+    <div class="mid"><button class="btn pri" id="act">Submit</button><button class="btn" id="next">Next</button></div>
+  </div>
+  <div class="dots" id="dots"></div>
+</div>
+
+<script>
+const MODS={1:"Module 1 - The History",2:"Module 2 - Risk Management",3:"Module 3 - Structure & Governance",4:"Module 4 - Membership & Programs"};
+const Q=[
+{m:1,type:"fill",head:"Drag and drop the missing words into the correct blank.",small:true,prompt:"What is the purpose of Delta Sigma Pi as stated in the Preamble of our Bylaws?",
+ text:"Delta Sigma Pi is a {0} fraternity organized to foster the study of {1} in universities; to encourage {2}, social activity and the association of students for their mutual advancement by research and practice; to promote closer affiliation between the {3} world and {4} of {5}, and to further a higher standard of commercial {6} and culture and the civic and commercial welfare of the community.",
+ answers:["professional","business","scholarship","commercial","students","commerce","ethics"],extra:[]},
+{m:1,type:"single",head:"Choose One",prompt:"Select the date and place of the founding of Delta Sigma Pi.",
+ opts:["New York University on August 7, 1907","New York University School of Commerce, Accounts, and Finance on November 7, 1907","University of Chicago School of Commerce, Accounts, and Finance, on November 7, 1907"],ans:[1],
+ exp:"The founding date and place of Delta Sigma Pi is New York University School of Commerce, Accounts, and Finance on November 7, 1907."},
+{m:1,type:"list",anyOrder:true,head:"Drag and Drop",prompt:"Can you identify the four names of the Delta Sigma Pi Founders?",
+ answers:["Alfred Moysello","Henry Albert Tienken","Harold Valentine Jacobs","Alexander Frank Makay"],extra:["H.G. “Gig” Wright","Onuka Ibe"],
+ exp:"The four Delta Sigma Pi Founders are Alfred Moysello, Henry Albert Tienken, Harold Valentine Jacobs, and Alexander Frank Makay."},
+{m:1,type:"single",head:"Choose One",prompt:"Who established the Central Office and served as its Executive Director for 31 years?",
+ opts:["Alexander Frank Makay","Alfred Moysello","H. G. “Gig” Wright","Henry Albert Tienken","William Schilling","Harold Valentine Jacobs"],ans:[2],
+ exp:"H. G. “Gig” Wright established the Central Office and served as its Executive Director for 31 years."},
+{m:1,type:"single",head:"Choose One",prompt:"Where is the Central Office located today?",
+ opts:["44 West 4th Street #4, New York, NY","222 West Adams Street, Chicago, IL","330 South Campus Avenue, Oxford, OH"],ans:[2],
+ exp:"The Central Office is located at 330 South Campus Ave. Oxford, OH."},
+{m:1,type:"song",head:"Drag and Drop",prompt:"Put the following lines of the chorus of Rose of Deltasig in the proper order."},
+{m:1,type:"single",head:"Choose One",prompt:"Which of these is the correct nickname/abbreviation for a member of Delta Sigma Pi?",
+ opts:["Delt-sig","Delta Sig","Deltasig","D-sig","DSPer"],ans:[2],
+ exp:"Deltasig is the correct nickname/abbreviation for a member of Delta Sigma Pi."},
+{m:1,type:"greek",head:"Drag and Drop",prompt:"Can you identify the Greek letters Delta, Sigma, and Pi? Select the three letters of Delta, Sigma, and Pi (in the respective order) and drag and drop them in the boxes.",
+ answers:["Δ","Σ","Π"],labels:["DELTA","SIGMA","PI"],bank:["Α","Ψ","Ξ","Ω","Χ","Φ","Δ","Σ","Π"],
+ exp:"ΔΣΠ are the correct Greek letters for Delta Sigma Pi."},
+
+{m:2,type:"multi",head:"Select All That Apply",prompt:"Who makes up the “Organizational Members” as referenced in the Risk Management Policy?",
+ opts:["Collegiate Members","Alumni Members","Faculty Members","Pledges","Startup Group Members","Employees of Delta Sigma Pi","None of the above"],ans:[0,1,2,3,4,5],
+ exp:"Organizational Members are collegiate members, alumni members, faculty members, pledges, startup group members, and employees of Delta Sigma Pi."},
+{m:2,type:"single",head:"Choose One",prompt:"Which of the following is not one of the categories of Risk Management?",
+ opts:["Alcohol, Drugs and Fraternity Events","Hazing","Discrimination","Assault & Battery","Sexual Misconduct","Finances & Budgeting","Weapons, Firearms, Explosives, Incendiary Items","Chapter Houses and Meetings Facilities","Retaliation"],ans:[5],
+ exp:"Finances & Budgeting is not one of the categories of Risk Management."},
+{m:2,type:"single",head:"Choose One",prompt:"Alcohol may be present at the following:",
+ opts:["Pledge Meetings","Pledging Ceremony","Chapter Business and Executive Committee Meetings","Initiation Ceremony","None of the Above","All of the Above"],ans:[4],
+ exp:"Alcohol may not be present at pledge meetings, the Pledging Ceremony, chapter business and executive committee meetings, or the Initiation Ceremony."},
+{m:2,type:"single",head:"Choose One",prompt:"If there is an emergency related to risk management that requires immediate attention, who should be your first call?",
+ opts:["9-1-1 or campus security","District Director","Chapter Advisor","Regional Vice President","University Official","Executive Director at the Central Office","Board of Directors member"],ans:[0],
+ exp:"In an emergency, your first call is 9-1-1 or campus security."},
+{m:2,type:"single",head:"Choose One",prompt:"If you have an incident with your chapter and are contacted by the media, who do you direct them to?",
+ opts:["Chapter President","Your Big Brother","Executive Director at the Central Office","Chapter Advisor"],ans:[2],
+ exp:"Direct the media to the Executive Director at the Central Office."},
+{m:2,type:"single",head:"Choose One",prompt:"Is there any circumstance where hazing or sexual misconduct would be permissible?",
+ opts:["Yes","Maybe","Never"],ans:[2],exp:"Hazing and sexual misconduct are never permissible."},
+
+{m:3,type:"single",head:"Choose One",prompt:"Which of these is the Fraternity’s supreme governing body?",
+ opts:["The Leadership Foundation","The Board of Directors","The Grand Chapter","The Central Office"],ans:[2],
+ exp:"The Grand Chapter is the Fraternity’s supreme governing body."},
+{m:3,type:"match",head:"Match Game",prompt:"Use the blue dropdowns to match the responsibilities on the right to the correct entity within Delta Sigma Pi on the left.",
+ ents:["A) Grand Chapter","B) Board of Directors","C) Central Office & Staff"],
+ rows:[["National administrative headquarters of the Fraternity",2],["Members are elected to office",1],["Meets once every two years",0],
+  ["Coordinates and oversees the Chapter Management Program (CMP)",2],["Supreme governing body of the Fraternity in which is vested all legislative powers",0],["Provide interpretations of the Laws of the Fraternity",1]]},
+{m:3,type:"lead",head:"Drag-and-Drop",prompt:"Drag and drop the LEAD event to the correct description.",
+ rows:[["Full weekend leadership events focusing on personal, professional, chapter operational and leadership training which includes an awards banquet and Provincial Council meetings during which proposed changes to Bylaws and Ritual are discussed and voted on.","LEAD Provincial Conference"],
+  ["Leadership events provide opportunities to build chapter operational, professional, leadership, and personal skills in an effective way while also having fun -- programming complete on Saturday afternoon.","LEAD School"]],
+ exp:"A LEAD Provincial Conference is a full weekend with an awards banquet and Provincial Council meetings. A LEAD School finishes on Saturday afternoon."},
+{m:3,type:"multi",head:"Select All That Apply:",prompt:"Select all of the items that describe the Delta Sigma Pi Leadership Foundation.",
+ opts:["The Delta Sigma Pi Leadership Foundation is the charitable giving arm of the Fraternity.","The Foundation is a registered 501(c)(3) charitable organization, gifts and donations are tax deductible to the extent allowable by law.","The purpose of the Leadership Foundation is to enforce policy and directives as set by the Board of Directors.","The mission of the Leadership Foundation is to financially support educational and charitable programs that enable members of Delta Sigma Pi to achieve individual and professional excellence.","The Leadership Foundation is the supreme body of the Fraternity in which is vested all legislative powers."],ans:[0,1,3],
+ exp:"The Foundation is the Fraternity’s charitable giving arm, a registered 501(c)(3), and it funds educational and charitable programs for members."},
+{m:3,type:"multi",head:"Select All That Apply:",prompt:"What differentiates Central Office staff from volunteers such as Board of Directors or Regional Vice Presidents?",
+ opts:["Board and RVPs are elected at Grand Chapter Congress","Staff are elected at Grand Chapter Congress","Staff are hired and compensated as employees","Elected/Appointed Board and RVPs are volunteers and are not compensated","Staff sets policy"],ans:[0,2,3],
+ exp:"The Board and RVPs are elected at Grand Chapter Congress and are unpaid volunteers. Staff are hired and paid as employees."},
+
+{m:4,type:"single",head:"Choose One:",prompt:"What CMP health level indicates a chapter that is operationally sound. It functions within the guidelines and expectations of the national Fraternity as well as being aligned with the strategic direction of the organization",
+ opts:["Exceptional Health","Strong Health","Marginal Health","Poor Health","Unhealthy"],ans:[1],
+ exp:"Strong Health describes a chapter that is operationally sound and aligned with the Fraternity’s strategic direction."},
+{m:4,type:"multi",head:"Select All That Apply:",prompt:"What are some Fraternity functions the Delta Sigma Pi Leadership Foundation provides financial support for?",
+ opts:["Leadership and training programs at national events","Management of Chapter Leadership Funds (CLF)","Alumni receptions","Educational scholarships for members","The Collegian of the Year (COY) program","Chapter dues"],ans:[0,1,3,4],
+ exp:"The Foundation funds leadership and training programs at national events, Chapter Leadership Funds, educational scholarships, and the Collegian of the Year program."},
+{m:4,type:"multi",head:"Select All That Apply:",prompt:"Name several ways to support the Fraternity after graduation.",
+ opts:["Join an alumni chapter","Donate to the Leadership Foundation","Serve in an elected or appointed volunteer leadership role","Present to a local chapter to help them meet professional activities requirements","Attend, volunteer, or present at a LEAD Event","Host an on-site tour of your company for local collegiate or alumni chapters","Attend local collegiate chapter events or initiations","None of the above"],ans:[0,1,2,3,4,5,6],
+ exp:"All seven options are ways to support the Fraternity after graduation."},
+{m:4,type:"multi",head:"Select All That Apply:",prompt:"What makes an ideal member?",
+ opts:["Finds ways to live out the Purpose of the Fraternity in their daily life","Gives to the Fraternity of their time and talent","Conducts themselves in an ethical manner","Donates to charities","Actively supports the Fraternity","Visits their collegiate chapter weekly for local collegiate or alumni chapters","Contacts their parents frequently"],ans:[0,1,2,4],
+ exp:"An ideal member lives out the Purpose, gives time and talent, acts ethically, and actively supports the Fraternity."},
+{m:4,type:"multi",head:"Select All That Apply:",prompt:"What makes an ideal chapter?",
+ opts:["Supports the objectives of the Fraternity","Works as a unit","Maintains open communication with the Fraternity","Maintains a strong CMP health","All members are on the University honor roll","All officers hold positions with other student business organizations"],ans:[0,1,2,3],
+ exp:"An ideal chapter supports the Fraternity’s objectives, works as a unit, keeps open communication with the Fraternity, and maintains a strong CMP health."},
+{m:4,type:"single",head:"Choose One",extraQ:true,prompt:"To whom is the Delta Sigma Pi Scholarship Key awarded?",
+ opts:["The graduating student with the highest GPA who is a member in good standing with Delta Sigma Pi at the time of graduation.","The graduating student with the highest academic average in business administration or economics, as long as they are affiliated with Delta Sigma Pi","The graduating student with the highest cumulative academic average in business administration or economics, regardless of affiliation with Delta Sigma Pi"],ans:[2],
+ exp:"The Scholarship Key goes to the graduating student with the highest cumulative average in business administration or economics, whether or not they are a Deltasig."}
+];
+Q.find(q=>q.type==="fill").exp="Delta Sigma Pi is a professional fraternity organized to foster the study of business in universities; to encourage scholarship, social activity and the association of students for their mutual advancement by research and practice; to promote closer affiliation between the commercial world and students of commerce, and to further a higher standard of commercial ethics and culture and the civic and commercial welfare of the community.";
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const LET="ABCDEFGHIJ";
+/* ===== ROSE OF DELTASIG CHORUS =====
+   Paste the 7 chorus lines below, in the correct order, one per line, each in quotes and followed by a comma.
+   Example format:  "First line here",
+   Leave the list empty to have the quiz ask for the lines on the song question instead. */
+const SONG_LINES=[
+
+];
+/* ===================================== */
+const SONG_KEY="dsp-rose-lines";let memSong=null,sharedSong=null,db=null,canWrite=true;
+function getSong(){if(SONG_LINES.length)return SONG_LINES;if(sharedSong)return sharedSong;try{const v=JSON.parse(localStorage.getItem(SONG_KEY)||"null");if(Array.isArray(v)&&v.length)return v}catch(e){}return memSong}
+function setSong(l){memSong=l;try{localStorage.setItem(SONG_KEY,JSON.stringify(l))}catch(e){}
+  if(db&&canWrite){sharedSong=l;db.doc("config/song").set({lines:l}).catch(()=>{sharedSong=null})}}
+
+let S,cur=0,sel=null,shuf=false,editSong=false;
+function chipSet(texts){return shuffle(texts.map((t,k)=>({id:"c"+k,t})))}
+function makeItem(q){
+  switch(q.type){
+    case "single":case "multi":return {pick:new Set(),order:shuf?shuffle(q.opts.map((_,k)=>k)):q.opts.map((_,k)=>k)};
+    case "fill":return {chips:chipSet([...q.answers,...q.extra]),place:q.answers.map(()=>null)};
+    case "list":return {chips:chipSet([...q.answers,...q.extra]),place:q.answers.map(()=>null)};
+    case "greek":return {chips:(shuf?shuffle:(a=>a))(q.bank.map((t,k)=>({id:"g"+k,t}))),place:[null,null,null]};
+    case "lead":return {chips:chipSet(q.rows.map(r=>r[1])),place:q.rows.map(()=>null)};
+    case "match":return {vals:q.rows.map(()=>-1)};
+    case "song":{const ln=getSong();return ln?{lines:ln,chips:chipSet(ln),place:ln.map(()=>null)}:{nosong:true}}
+  }
+}
+function init(){S={items:Q.map(makeItem),sub:Q.map(()=>false),first:Q.map(()=>null),hideFb:false,done:false};cur=0;sel=null;render()}
+const txt=(it,id)=>(it.chips.find(c=>c.id===id)||{}).t;
+
+function grade(i){
+  const q=Q[i],it=S.items[i];
+  if(q.type==="single"||q.type==="multi"){const a=new Set(q.ans);return it.pick.size===a.size&&[...it.pick].every(x=>a.has(x))}
+  if(q.type==="match")return it.vals.every((v,k)=>v===q.rows[k][1]);
+  if(it.nosong)return false;
+  const placed=it.place.map(id=>txt(it,id));
+  if(q.anyOrder){const a=new Set(q.answers);return placed.every(t=>t&&a.has(t))&&new Set(placed).size===a.size}
+  const key=q.type==="lead"?q.rows.map(r=>r[1]):q.type==="song"?it.lines:q.answers;
+  return placed.every((t,k)=>t===key[k]);
+}
+function complete(i){
+  const q=Q[i],it=S.items[i];
+  if(q.type==="single"||q.type==="multi")return it.pick.size>0;
+  if(q.type==="match")return it.vals.every(v=>v>-1);
+  if(it.nosong)return false;
+  return it.place.every(Boolean);
+}
+
+/* ---------- rendering ---------- */
+function chipHTML(i,c,cls,locked){
+  const s=sel&&sel.i===i&&sel.id===c.id?" sel":"";
+  return `<span class="${cls}${s}" ${locked?"":'draggable="true" tabindex="0" role="button"'} data-i="${i}" data-id="${c.id}">${esc(c.t)}</span>`;
+}
+function slotHTML(i,k,inner,locked,extra=""){
+  const it=S.items[i],id=it.place[k];
+  const hot=!id&&sel&&sel.i===i?" hot":"";
+  return `<span class="slot${id?" filled":""}${hot}${extra}" ${locked?"":'tabindex="0" role="button"'} data-i="${i}" data-k="${k}" aria-label="Drop box ${k+1}">${id?inner(it.chips.find(c=>c.id===id)):(locked?"":"drop here")}</span>`;
+}
+function render(){
+  const sl=$("#slide");
+  if(S.done)return renderResults();
+  const q=Q[cur],it=S.items[cur],locked=S.sub[cur];
+  $("#mtitle").textContent="Delta Sigma Pi - "+MODS[q.m].split(" - ")[1];
+  const inMod=Q.filter(x=>x.m===q.m),pos=inMod.indexOf(q)+1;
+  $("#mcount").textContent=MODS[q.m].split(" - ")[0].toUpperCase();
+  let h=`<span class="badge">Question ${pos}</span><h2 class="${q.small?"small":""}">${esc(q.head)}</h2><p class="prompt">${esc(q.prompt)}</p>`;
+
+  if(q.type==="single"||q.type==="multi"){
+    h+=`<div class="opts" role="${q.type==="single"?"radiogroup":"group"}">`+it.order.map((oi,k)=>
+      `<button class="opt${it.pick.has(oi)?" on":""}" data-o="${oi}" ${locked?"disabled":""} role="${q.type==="single"?"radio":"checkbox"}" aria-checked="${it.pick.has(oi)}"><span class="L">${LET[k]}</span><span class="T">${esc(q.opts[oi])}</span></button>`).join("")+`</div>`;
+  }
+  else if(q.type==="fill"){
+    const placed=new Set(it.place.filter(Boolean));
+    h+=`<p class="para">${esc(q.text).replace(/\{(\d)\}/g,(_,k)=>slotHTML(cur,+k,c=>chipHTML(cur,c,"chip",locked),locked))}</p>`;
+    h+=`<div class="bank row">${it.chips.filter(c=>!placed.has(c.id)).map(c=>chipHTML(cur,c,"chip",locked)).join("")}</div>`;
+  }
+  else if(q.type==="list"||(q.type==="song"&&!it.nosong&&!editSong)){
+    const placed=new Set(it.place.filter(Boolean));
+    h+=`<div class="two"><div class="nums">`+it.place.map((_,k)=>`<div class="num"><b>${k+1}.</b>${slotHTML(cur,k,c=>chipHTML(cur,c,"chip",locked),locked)}</div>`).join("")+`</div>
+      <div class="bank">${it.chips.filter(c=>!placed.has(c.id)).map(c=>chipHTML(cur,c,"chip",locked)).join("")}</div></div>`;
+    if(q.type==="song"&&!locked&&canWrite&&!SONG_LINES.length)h+=`<p style="margin:18px 0 0"><button class="btn" data-act="editSong">Edit saved lines</button></p>`;
+  }
+  else if(q.type==="song"){
+    const ln=getSong();
+    h+=`<p class="setupnote"><b>One-time setup.</b> Type or paste the seven chorus lines from your module in the correct order, one line per row. The quiz scrambles them every time you practice. Saved lines stay in this browser only.</p>
+      <textarea id="songIn" aria-label="Chorus lines, one per row">${ln?esc(ln.join("\n")):""}</textarea>
+      <p style="margin:12px 0 0;display:flex;gap:12px;align-items:center;flex-wrap:wrap"><button class="btn pri" data-act="saveSong">Save lines</button><span id="songMsg"></span></p>`;
+  }
+  else if(q.type==="greek"){
+    const placed=new Set(it.place.filter(Boolean));
+    h+=`<div class="greek"><div class="tiles">${it.chips.map(c=>placed.has(c.id)?`<span></span>`:chipHTML(cur,c,"gtile",locked)).join("")}</div>
+      <div class="drops">${q.labels.map((lb,k)=>`<div class="drop">${slotHTML(cur,k,c=>chipHTML(cur,c,"gtile",locked),locked)}<span>${lb}</span></div>`).join("")}</div></div>`;
+  }
+  else if(q.type==="lead"){
+    const placed=new Set(it.place.filter(Boolean));
+    h+=`<div class="leadbank">${it.chips.filter(c=>!placed.has(c.id)).map(c=>chipHTML(cur,c,"circ",locked)).join("")}</div>`;
+    h+=q.rows.map((r,k)=>`<div class="leadrow">${slotHTML(cur,k,c=>chipHTML(cur,c,"circ",locked),locked)}<div class="desc">${esc(r[0])}</div></div>`).join("");
+  }
+  else if(q.type==="match"){
+    h+=`<div class="match"><div class="ents">${q.ents.map(e=>`<div class="ent">${esc(e)}</div>`).join("")}</div><div class="mrows">`+
+      q.rows.map((r,k)=>`<div class="mrow"><select class="msel" id="msel${k}" data-m="${k}" ${locked?"disabled":""} aria-label="Match for: ${esc(r[0])}"><option value="-1" ${it.vals[k]<0?"selected":""}>–</option>${[0,1,2].map(j=>`<option value="${j}" ${it.vals[k]===j?"selected":""}>${LET[j]}</option>`).join("")}</select><div class="st">${esc(r[0])}</div></div>`).join("")+`</div></div>`;
+  }
+
+  if(locked&&!S.hideFb){
+    const ok=grade(cur);let exp=q.exp||"";let long=q.type==="fill"||exp.length>170;
+    if(q.type==="song")exp=`The chorus of the <i>Rose of Deltasig</i> song is:<div style="margin-top:10px;text-align:left;line-height:1.45">${it.lines.map(l=>esc(l)).join("<br>")}</div>`,long=true;
+    else if(q.type==="match")exp=`<ul>${q.rows.map(r=>`<li>${LET[r[1]]}: ${esc(r[0])}</li>`).join("")}</ul>`,long=true;
+    else exp=(q.type==="fill"?"The purpose of Delta Sigma Pi is as follows: ":"")+esc(exp);
+    h+=`<div class="exp${long?" long":""}">${exp}</div><div class="fb ${ok?"ok":"no"}">${ok?"Correct":"Incorrect"}<button data-act="closeFb" aria-label="Close feedback">✕</button></div>`;
+  }
+  sl.innerHTML=h;
+  // nav
+  $("#prev").disabled=cur===0;
+  const songSetup=q.type==="song"&&(it.nosong||editSong);
+  $("#act").textContent=locked?"Try again":"Submit";
+  $("#act").disabled=songSetup||(!locked&&!complete(cur));
+  $("#next").textContent=cur===Q.length-1?"Finish":"Next";
+  $("#count").textContent=`${cur+1} of ${Q.length}`;
+  $("#dots").innerHTML=Q.map((x,k)=>`<button class="dot${k===cur?" cur":""}${S.first[k]===true?" ok":S.first[k]===false?" no":""}${k>0&&Q[k-1].m!==x.m?" mod":""}" data-go="${k}" aria-label="Go to question ${k+1}"></button>`).join("");
+}
+function renderResults(){
+  const counted=Q.map((q,k)=>k).filter(k=>!(Q[k].type==="song"&&S.items[k].nosong));
+  const right=counted.filter(k=>S.first[k]===true).length,pct=Math.round(right/counted.length*100);
+  const missed=counted.filter(k=>S.first[k]!==true);
+  $("#mtitle").textContent="Delta Sigma Pi - Final Exam";$("#mcount").textContent="RESULTS";
+  $("#slide").innerHTML=`<div class="res"><h2>Exam Complete</h2><div class="big">${right} / ${counted.length} · ${pct}%</div>
+    <p class="prompt" style="margin:0">${pct>=80?"You scored at or above 80%.":"You scored below 80%. Review the questions below and try again."} Scores count your first submit on each question.</p>
+    ${missed.length?`<ul>${missed.map(k=>`<li><button data-go="${k}">${esc(MODS[Q[k].m].split(" - ")[0])}, Q${Q.filter(x=>x.m===Q[k].m).indexOf(Q[k])+1}: ${esc(Q[k].prompt.slice(0,80))}${Q[k].prompt.length>80?"…":""}</button></li>`).join("")}</ul>`:"<p></p>"}
+    <div class="acts"><button class="btn pri" data-act="retake">Retake exam</button><button class="btn" data-act="retakeShuf">Retake with shuffled answers</button></div></div>`;
+  $("#prev").disabled=false;$("#act").disabled=true;$("#act").textContent="Submit";$("#next").textContent="Next";$("#next").disabled=true;
+  $("#count").textContent="Results";
+}
+
+/* ---------- interaction ---------- */
+function place(i,k,id){const it=S.items[i];const f=it.place.indexOf(id);if(f>-1)it.place[f]=null;it.place[k]=id;sel=null;render()}
+function tapChip(t){
+  const i=+t.dataset.i,id=t.dataset.id,it=S.items[i];
+  const inSlot=it.place.indexOf(id);
+  if(inSlot>-1&&!(sel&&sel.i===i)){it.place[inSlot]=null;sel=null;render();return}
+  if(inSlot>-1&&sel){place(i,inSlot,sel.id);return}
+  sel=(sel&&sel.id===id)?null:{i,id};render();
+}
+function tapSlot(t){
+  const i=+t.dataset.i,k=+t.dataset.k,it=S.items[i];
+  if(sel&&sel.i===i)place(i,k,sel.id);
+  else if(it.place[k]){it.place[k]=null;render()}
+}
+document.addEventListener("click",e=>{
+  const go=e.target.closest("[data-go]");
+  if(go){S.done=false;cur=+go.dataset.go;sel=null;S.hideFb=false;$("#next").disabled=false;render();return}
+  const act=e.target.closest("[data-act]");
+  if(act){const a=act.dataset.act;
+    if(a==="closeFb"){S.hideFb=true;render()}
+    if(a==="editSong"){editSong=true;render()}
+    if(a==="saveSong"){const ln=$("#songIn").value.split("\n").map(s=>s.trim()).filter(Boolean);
+      if(ln.length<2){$("#songMsg").textContent="Enter at least two lines.";return}
+      setSong(ln);editSong=false;const si=Q.findIndex(q=>q.type==="song");S.items[si]=makeItem(Q[si]);S.sub[si]=false;render()}
+    if(a==="retake"){shuf=false;init();$("#next").disabled=false}
+    if(a==="retakeShuf"){shuf=true;init();$("#next").disabled=false}
+    return}
+  if(S.done||S.sub[cur])return;
+  const opt=e.target.closest(".opt");
+  if(opt){const q=Q[cur],it=S.items[cur],o=+opt.dataset.o;
+    if(q.type==="single")it.pick=new Set([o]);else it.pick.has(o)?it.pick.delete(o):it.pick.add(o);render();return}
+  const chip=e.target.closest(".chip,.gtile,.circ");if(chip&&chip.dataset.id){tapChip(chip);return}
+  const slot=e.target.closest(".slot");if(slot)tapSlot(slot);
+});
+document.addEventListener("change",e=>{const m=e.target.closest&&e.target.closest(".msel");if(!m||S.sub[cur])return;
+  const k=+m.dataset.m;S.items[cur].vals[k]=+m.value;render();const again=document.getElementById("msel"+k);if(again)again.focus()});
+document.addEventListener("keydown",e=>{
+  if((e.key==="Enter"||e.key===" ")&&e.target.matches(".chip,.gtile,.circ,.slot")){e.preventDefault();e.target.click()}
+});
+document.addEventListener("dragstart",e=>{const c=e.target.closest&&e.target.closest("[data-id]");if(!c||S.sub[cur])return;
+  e.dataTransfer.setData("text/plain",c.dataset.id);e.dataTransfer.effectAllowed="move"});
+document.addEventListener("dragover",e=>{if(e.target.closest&&e.target.closest(".slot"))e.preventDefault()});
+document.addEventListener("drop",e=>{const s=e.target.closest&&e.target.closest(".slot");if(!s||S.sub[cur])return;e.preventDefault();
+  const id=e.dataTransfer.getData("text/plain");if(S.items[cur].chips.some(c=>c.id===id))place(cur,+s.dataset.k,id)});
+
+$("#act").onclick=()=>{
+  if(S.sub[cur]){S.sub[cur]=false;S.hideFb=false;S.items[cur]=makeItem(Q[cur]);render();return}
+  S.sub[cur]=true;S.hideFb=false;if(S.first[cur]===null)S.first[cur]=grade(cur);sel=null;render();
+};
+$("#prev").onclick=()=>{if(S.done){S.done=false;$("#next").disabled=false;cur=Q.length-1}else if(cur>0)cur--;sel=null;S.hideFb=false;render()};
+$("#next").onclick=()=>{sel=null;S.hideFb=false;if(cur===Q.length-1){S.done=true}else cur++;render();window.scrollTo({top:0,behavior:"smooth"})};
+init();
+(async()=>{try{
+  if(!window.claude||!window.claude.use)return;
+  db=await window.claude.use("db");if(!db)return;
+  const user=await window.claude.use("user");
+  canWrite=user?await user.canEdit():false;
+  db.doc("config/song").onSnapshot(snap=>{
+    const v=snap.exists?(snap.data()||{}).lines:null;
+    const nv=Array.isArray(v)&&v.length?v.map(String):null;
+    if(JSON.stringify(nv)===JSON.stringify(sharedSong))return;
+    sharedSong=nv;
+    const si=Q.findIndex(q=>q.type==="song");
+    if(!S.sub[si]&&!editSong){S.items[si]=makeItem(Q[si]);if(!S.done)render()}
+  },()=>{});
+  if(!S.done)render();
+}catch(e){}})();
+</script>
+
+</body>
+</html>
